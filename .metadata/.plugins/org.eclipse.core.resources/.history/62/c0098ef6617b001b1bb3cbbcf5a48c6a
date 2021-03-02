@@ -1,0 +1,73 @@
+package net.asforil.VendoBeneweb.config;
+
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+	
+	@Autowired
+    private DataSource dataSource;
+	
+	@Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+	
+	
+	@Autowired
+    protected void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
+        auth
+              .jdbcAuthentication()
+              .dataSource(dataSource)
+              .passwordEncoder(passwordEncoder())
+              .usersByUsernameQuery( "SELECT email, psw, enabled from utenti where email = ?")
+              .authoritiesByUsernameQuery("select ut.email, r.descrizione\r\n" + 
+              		"from ruoli r inner join   \r\n" + 
+              		"      (select u.email, ru.idruolo \r\n" + 
+              		"      from utenti u inner join ruoliutente ru\r\n" + 
+              		"      on u.idutente = ru.idutente\r\n" + 
+              		"      where u.email= ? ) ut\r\n" + 
+              		"on r.idruolo = ut.idruolo");
+              
+    }
+	
+	
+	@Override
+	  protected void configure(HttpSecurity http) throws Exception  {
+		http
+		      .authorizeRequests()
+		          .antMatchers("/home").permitAll()
+		          .antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+		          .antMatchers("/user/**").hasAuthority("ROLE_USER")
+                  .anyRequest().authenticated()
+                  .and()
+              .formLogin()  
+                  .loginPage("/login")
+                  .defaultSuccessUrl("/homelogin")
+                  .failureUrl("/login?error=true")
+                  .permitAll()
+                  .and()
+              .logout()
+                  .permitAll();
+		
+		http.exceptionHandling().accessDeniedPage("/403");
+		
+		
+		
+	}
+	
+	
+
+}

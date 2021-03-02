@@ -1,0 +1,8 @@
+INDEX VERSION 1.4+C:\Users\aless\coding\corso java\PROGETTI\test colloquio bancomat\eclipse-ws-atmWeb\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+1565070728.index
+2002567695.index
+2865122054.index
+1013920.index
+1637622266.index
+1917309667.index
+921423392.index

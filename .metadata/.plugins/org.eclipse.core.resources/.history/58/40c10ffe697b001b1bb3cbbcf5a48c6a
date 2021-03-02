@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+  <div>
+    <h2> Welcome</h2>
+  </div>
+  <div>
+     <a th:href="@{/atms}"></a>
+  </div>
+  
+</body>
+</html>

@@ -1,0 +1,5 @@
+package net.asforil.AtmWeb.controller;
+
+public class AtmWebController {
+
+}

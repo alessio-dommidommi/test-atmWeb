@@ -1,0 +1,82 @@
+package net.asforil.AtmWeb.config;
+
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+	
+	
+	
+	
+	
+/*	
+	@Autowired
+    protected void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
+        auth
+              .jdbcAuthentication()
+              .dataSource(dataSource)
+              .passwordEncoder(passwordEncoder())
+              .usersByUsernameQuery( "SELECT email, psw, enabled from utenti where email = ?")
+              .authoritiesByUsernameQuery("select ut.email, r.descrizione\r\n" + 
+              		"from ruoli r inner join   \r\n" + 
+              		"      (select u.email, ru.idruolo \r\n" + 
+              		"      from utenti u inner join ruoliutente ru\r\n" + 
+              		"      on u.idutente = ru.idutente\r\n" + 
+              		"      where u.email= ? ) ut\r\n" + 
+              		"on r.idruolo = ut.idruolo");
+              
+    }
+*/	
+	
+	@Override
+	  protected void configure(HttpSecurity http) throws Exception  {
+		http
+		      .authorizeRequests() 		      
+		          .antMatchers("/home").permitAll()		          		          
+                  .anyRequest().authenticated()
+                  .and()
+              .formLogin()                   
+                  .defaultSuccessUrl("/atms")
+                  .failureUrl("/login?error=true")
+                  .permitAll()
+                  .and()
+              .logout()
+                  .permitAll();
+		
+		http.exceptionHandling().accessDeniedPage("/403");
+		
+		
+	}
+	
+	// create a user in memory with username=user and password=user and role=USER
+	@Bean
+	@Override
+	public UserDetailsService userDetailsService() {
+		
+		UserDetails user = User.withUsername("user")				
+				               .password("user")
+				               .roles("USER")
+				               .build();
+
+		return new InMemoryUserDetailsManager(user);
+	}
+	
+	
+
+}
